@@ -13,7 +13,6 @@
 #include <Kismet/GameplayStatics.h>
 #include "UObject/Class.h"
 #include "GameFramework/Character.h"
-#include "Room.h"
 
 void ASquadPlayerController::BeginPlay()
 {
@@ -98,7 +97,7 @@ FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHi
 				{
 					//if (Actor->Implements<USquadInterface>())
 					{	//We're checking to see if this actor has an assigned member. If not, assign one through SquadPlayerController::GetAvailableMember. If it already does, recall them.
-						//ISquadInterface::Execute_CheckAssignedMember(Actor, CommandPoint);
+					//	ISquadInterface::Execute_CheckAssignedMember(Actor, CommandPoint);
 						CommandPoint.Location.X = 0.00f; //This is to restrict other AI other than the one specified in GetAvailableMember from moving to this location.
 					}
 				}
@@ -138,27 +137,49 @@ TArray<AActor*> ASquadPlayerController::GetRooms(AActor* Building)
 	for (AActor* Room : RoomsInBuilding)
 	{
 		FVector RoomLocation = Room->GetActorLocation();
-		ARoom* BPRoom = Cast<ARoom>(Room);
-		CheckRoomValues(BPRoom);
+		UChildActorComponent* BPRoom = Cast<UChildActorComponent>(Room);
+		UClass* ActorClass = Room->GetClass();
+		CheckRoomValues(ActorClass, Room);
 
 	}
 	return RoomsInBuilding;
 }
 
-void ASquadPlayerController::CheckRoomValues(ARoom* Room)
+void ASquadPlayerController::CheckRoomValues(UClass* ActorClass, AActor* Room)
 {
-	if (!Room->bIsCleared) //Check to see if the value of bIsCleared is false.
+	FProperty* IsCleared = ActorClass->FindPropertyByName(TEXT("bIsCleared"));
+	if (IsCleared) // Checking to see if there is a property by name of bIsCleared
 	{
-		if (Room->AssignedSquadMember == nullptr) //Check to see if there is a property by the name of AssignedSquadMember
+		bool* ClearedValue = IsCleared->ContainerPtrToValuePtr<bool>(Room);
+
+		if (!*ClearedValue) //Check to see if the value of bIsCleared is false.
 		{
-					AssignRoom(Room);
+			FProperty* AssignedSquadMember = ActorClass->FindPropertyByName(TEXT("AssignedSquadMember"));
+			if (AssignedSquadMember) //Check to see if there is a property by the name of AssignedSquadMember
+			{
+				ASquadAIController* AssignedValue = AssignedSquadMember->ContainerPtrToValuePtr<ASquadAIController>(Room);
+				if (AssignedValue) //Check to see if AssignedSquadMember's value is a pointer of type ASquadAIController
+				{
+					if (AssignedValue->GetCharacter() == nullptr) //Check to see if the value of SquadMember's GetCharacter is a nullptr
+					{
+						UE_LOG(LogTemp, Warning, TEXT("CheckRoomValues->AssignRoom"));
+						AssignRoom(Room, AssignedValue);
 
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("CheckRoomValuesSafety->AssignRoom"));
+						AssignedValue = nullptr;
+						AssignRoom(Room, AssignedValue);
 
+					}
+				}
+			}
 		}
 	}
 }
 
-void ASquadPlayerController::AssignRoom(ARoom* Room)
+void ASquadPlayerController::AssignRoom(AActor* Room, ASquadAIController* AssignedValue)
 {
 	for (AActor* Member : SquadMembers)
 	{
@@ -168,7 +189,7 @@ void ASquadPlayerController::AssignRoom(ARoom* Room)
 			//if (Commando->Room == nullptr) //Check to see if the squad member has an assigned room alread
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Commando->Room == nullptr"));
-				Room->AssignedSquadMember = Commando;
+				AssignedValue = Commando;
 				//Commando->Room = Room;
 				//Commando->ClearRoom();
 				return;

@@ -45,9 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetRooms(AActor* Building);
 	UFUNCTION()
-	void CheckRoomValues(ARoom* Room);
+	void CheckRoomValues(UClass* ActorClass, AActor* Room);
 	UFUNCTION()
-	void AssignRoom(ARoom* Room);
+	void AssignRoom(AActor* Room, ASquadAIController* AssignedValue);
 	UFUNCTION()
 	void DeployInvestigate(FCommandPoint CommandPoint);
 	UFUNCTION()

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SquadAIController.h"
 #include "Room.generated.h"
 
 UCLASS()
@@ -15,11 +14,6 @@ class SQUADV2_API ARoom : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ARoom();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
-	bool bIsCleared = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
-	ASquadAIController* AssignedSquadMember;
 
 protected:
 	// Called when the game starts or when spawned
