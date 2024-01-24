@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "SquadPlayerController.h"
-#include "TimerManager.h"
-#include "Perception/AIPerceptionComponent.h"
 #include "SquadAIController.generated.h"
 
 /**
@@ -18,5 +15,3 @@ class SQUADV2_API ASquadAIController : public AAIController
 	GENERATED_BODY()
 	
 };
-
-
