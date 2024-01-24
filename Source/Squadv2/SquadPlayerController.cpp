@@ -149,7 +149,7 @@ void ASquadPlayerController::CheckRoomValues(ARoom* Room)
 {
 	if (!Room->bIsCleared) //Check to see if the value of bIsCleared is false.
 	{
-		if (Room->AssignedSquadMember == nullptr) //Check to see if there is a property by the name of AssignedSquadMember
+		//if (Room->AssignedSquadMember == nullptr) //Check to see if there is a property by the name of AssignedSquadMember
 		{
 					AssignRoom(Room);
 
@@ -168,7 +168,7 @@ void ASquadPlayerController::AssignRoom(ARoom* Room)
 			//if (Commando->Room == nullptr) //Check to see if the squad member has an assigned room alread
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Commando->Room == nullptr"));
-				Room->AssignedSquadMember = Commando;
+				//Room->AssignedSquadMember = Commando;
 				//Commando->Room = Room;
 				//Commando->ClearRoom();
 				return;

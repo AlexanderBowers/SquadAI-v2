@@ -10,13 +10,16 @@
 #include "SquadAIController.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SQUADV2_API ASquadAIController : public AAIController
 {
 	GENERATED_BODY()
+
+public:
 	
+
 };
 
 
