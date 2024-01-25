@@ -126,7 +126,6 @@ void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if th
 		if (DistanceToCommand <= DistanceThreshold)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Distance threshold met."));
-			StopMovement();
 			if (CommandPoint.Type == FName("Cover")) // trying to convert this to switch statement
 			{
 				GetCharacter()->Crouch();
@@ -141,8 +140,7 @@ void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if th
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Setting delegate"));
-			GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 2000.0f, false, 0.0f);
+			GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 200.0f, false, 0.0f);
 
 		}
 	}
