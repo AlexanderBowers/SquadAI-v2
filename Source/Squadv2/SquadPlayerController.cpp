@@ -288,7 +288,14 @@ void ASquadPlayerController::MoveUpCommand()
 			//CreateCommandPointy checks to see if the hitresult actor has a Command Component and its type.
 			FCommandPoint CommandPoint = CreateCommandPoint(HitResult);
 			CommandList.Add(CommandPoint);
-
+			for (AActor* AI : SquadMembers)
+			{
+				ASquadAIController* Commando = Cast<ASquadAIController>(AI);
+				if (Commando)
+				{
+					Commando->MoveToCommand(CommandPoint);
+				}
+			}
 		}
 	}
 }

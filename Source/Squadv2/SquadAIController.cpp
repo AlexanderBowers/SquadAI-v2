@@ -49,15 +49,6 @@ void ASquadAIController::Tick(float DeltaTime)
 
 			}
 
-			if (PlayerController->CommandList.Num() > 0)
-			{
-				if (PlayerController->CommandList.Last().Location != LastCommand.Location)
-				{
-					MoveToCommand(PlayerController->CommandList.Last()); //Get the most recent command and prepare to move to it.
-
-				}
-			}
-
 			if (FVector::Distance(GetCharacter()->GetActorLocation(), PlayerController->GetPawn()->GetActorLocation()) >= 1000.0f)
 			{
 				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
@@ -73,43 +64,45 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 	if (TheBlackboard)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Destination: %s"), *CommandPoint.Location.ToString());
-		if (CommandPoint.Type == FName("Target"))
+		if (LastCommand.Location != CommandPoint.Location)
 		{
-			if (this->GetPawn()->Implements<USquadInterface>())
+			if (CommandPoint.Type == FName("Target"))
 			{
-				if (CommandPoint.OwnerActor != nullptr)
+				if (this->GetPawn()->Implements<USquadInterface>())
 				{
-					ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
-					return;
+					if (CommandPoint.OwnerActor != nullptr)
+					{
+						ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
+						return;
+					}
 				}
 			}
-		}
-		if (CommandPoint.Type == FName("Return"))
-		{
-			ResetPriorityCommand();
-		}
-		if (TheBlackboard->GetValueAsBool(FName("bHasPriority")))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("HasPriority"));
-			return;
-		}
-		if (CommandPoint.Location.X == 0.00f)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
-			return;
-		}
-		if (TheBlackboard)
-		{
-			TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
-		}
-		if (GetCharacter()->bIsCrouched)
-		{
-			GetCharacter()->UnCrouch();
+			if (CommandPoint.Type == FName("Return"))
+			{
+				ResetPriorityCommand();
+			}
+			if (TheBlackboard->GetValueAsBool(FName("bIsAssigned")))
+			{
+				return;
+			}
+			if (CommandPoint.Location.X == 0.00f)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
+				return;
+			}
+			if (TheBlackboard)
+			{
+				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
+			}
+			if (GetCharacter()->bIsCrouched)
+			{
+				GetCharacter()->UnCrouch();
 
+			}
+			MoveToLocation(CommandPoint.Location, 0);
+			HandleCommand(CommandPoint);
+			LastCommand = CommandPoint;
 		}
-		MoveToLocation(CommandPoint.Location, 0);
-		HandleCommand(CommandPoint);
-		LastCommand = CommandPoint;
 	}
 
 }
