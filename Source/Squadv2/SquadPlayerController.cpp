@@ -165,17 +165,17 @@ void ASquadPlayerController::AssignRoom(ARoom* Room)
 		ASquadAIController* Commando = Cast<ASquadAIController>(Member);
 		if (Commando) //Check to see if the squad member is valid
 		{
-			//if (Commando->Room == nullptr) //Check to see if the squad member has an assigned room alread
+			UBlackboardComponent* Blackboard = Commando->GetBlackboardComponent();
+			if (Blackboard)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Commando->Room == nullptr"));
-				//Room->AssignedSquadMember = Commando;
-				//Commando->Room = Room;
-				//Commando->ClearRoom();
-				return;
-
+				if(Blackboard->GetValueAsObject(FName("Room")) == nullptr)
+				{
+					Room->AssignedSquadMember = Commando;
+					Blackboard->SetValueAsObject(FName("Room"), Room);
+					Commando->ClearRoom();
+				}
 			}
 		}
-
 	}
 }
 
