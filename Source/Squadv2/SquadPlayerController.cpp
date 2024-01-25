@@ -149,7 +149,7 @@ void ASquadPlayerController::CheckRoomValues(ARoom* Room)
 {
 	if (!Room->bIsCleared) //Check to see if the value of bIsCleared is false.
 	{
-		//if (Room->AssignedSquadMember == nullptr) //Check to see if there is a property by the name of AssignedSquadMember
+		if (Room->AssignedSquadMember == nullptr) //Check to see if there is a property by the name of AssignedSquadMember
 		{
 					AssignRoom(Room);
 
@@ -168,11 +168,12 @@ void ASquadPlayerController::AssignRoom(ARoom* Room)
 			UBlackboardComponent* Blackboard = Commando->GetBlackboardComponent();
 			if (Blackboard)
 			{
-				if(Blackboard->GetValueAsObject(FName("Room")) == nullptr)
+				if(Blackboard->GetValueAsObject(FName("Room")) == nullptr && Room->AssignedSquadMember == nullptr)
 				{
 					Room->AssignedSquadMember = Commando;
 					Blackboard->SetValueAsObject(FName("Room"), Room);
 					Commando->ClearRoom();
+					return;
 				}
 			}
 		}
