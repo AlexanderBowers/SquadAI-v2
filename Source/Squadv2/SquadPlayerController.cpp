@@ -311,6 +311,5 @@ void ASquadPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("MoveUpCommand", IE_Pressed, this, &ASquadPlayerController::MoveUpCommand);
 	InputComponent->BindAction("FormUpCommand", IE_Pressed, this, &ASquadPlayerController::FormUpCommand);
-	InputComponent->BindAction("FireProjectile", IE_Pressed, this, &ASquadPlayerController::FireProjectile);
 
 }
