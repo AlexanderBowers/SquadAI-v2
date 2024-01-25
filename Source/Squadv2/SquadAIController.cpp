@@ -141,8 +141,6 @@ void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if th
 
 void ASquadAIController::FollowPlayer()
 {
-	ResetPriorityCommand();
-
 	if (GetCharacter()->bIsCrouched)
 	{
 		GetCharacter()->UnCrouch();
