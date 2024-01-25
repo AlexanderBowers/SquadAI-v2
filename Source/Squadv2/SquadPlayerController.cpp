@@ -72,12 +72,12 @@ FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHi
 
 				if (CommandPoint.Type == FName("Detonate"))
 				{
-					//if (Actor->Implements<USquadInterface>())
+					if (Actor->Implements<USquadInterface>())
 					{
 						UStaticMeshComponent* BombPoint = Cast<UStaticMeshComponent>(Actor->GetDefaultSubobjectByName(TEXT("BombLocation")));
 						if (BombPoint)
 						{
-							//ISquadInterface::Execute_CheckAssignedMember(Actor, CommandPoint);
+							ISquadInterface::Execute_CheckAssignedMember(Actor, CommandPoint);
 							CommandPoint.Location.X = 0.00f;
 						}
 					}
@@ -96,9 +96,9 @@ FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHi
 				}
 				if (CommandPoint.Type == FName("FirePoint"))
 				{
-					//if (Actor->Implements<USquadInterface>())
+					if (Actor->Implements<USquadInterface>())
 					{	//We're checking to see if this actor has an assigned member. If not, assign one through SquadPlayerController::GetAvailableMember. If it already does, recall them.
-						//ISquadInterface::Execute_CheckAssignedMember(Actor, CommandPoint);
+						ISquadInterface::Execute_CheckAssignedMember(Actor, CommandPoint);
 						CommandPoint.Location.X = 0.00f; //This is to restrict other AI other than the one specified in GetAvailableMember from moving to this location.
 					}
 				}
