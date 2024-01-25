@@ -7,7 +7,6 @@
 #include "SquadPlayerController.h"
 #include "TimerManager.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "SquadAIController.generated.h"
 
 /**
@@ -25,12 +24,19 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FCommandPoint PriorityCommand;
+	UPROPERTY(EditAnywhere)
+	bool bShouldFollow = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Indoors")
+	bool bIsIndoors = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bHasPriority = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* AssignedPosition;
 
-
-	UPROPERTY(VisibleAnywhere)
-	UBlackboardComponent* TheBlackboard;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Indoors")
+	AActor* Building;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Indoors")
+	AActor* Room;
 
 	UFUNCTION()
 	void ClearRoom();

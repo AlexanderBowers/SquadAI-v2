@@ -5,6 +5,7 @@
 #include "SquadPlayerController.h"
 #include "Engine/EngineTypes.h"
 #include "SquadInterface.h"
+#include "Room.h"
 #include "SquadPlayerController.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -32,6 +33,7 @@ void ASquadAIController::BeginPlay()
 		LastCommand = BaseCommand;
 
 	}
+	TheBlackboard = GetBlackboardComponent();
 }
 
 void ASquadAIController::Tick(float DeltaTime)
@@ -39,98 +41,110 @@ void ASquadAIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (PlayerController)
 	{
-		if (bShouldFollow)
+		if (TheBlackboard)
 		{
-			FollowPlayer();
-
-		}
-
-		if (PlayerController->CommandList.Num() > 0)
-		{
-			if (PlayerController->CommandList.Last().Location != LastCommand.Location)
+			if (TheBlackboard->GetValueAsBool(FName("bShouldFollow")))
 			{
-				MoveToCommand(PlayerController->CommandList.Last()); //Get the most recent command and prepare to move to it.
+				FollowPlayer();
 
 			}
-		}
 
-		if (FVector::Distance(GetCharacter()->GetActorLocation(), PlayerController->GetPawn()->GetActorLocation()) >= 1000.0f)
-		{
-			bShouldFollow = true;
-			FollowPlayer();
+			if (PlayerController->CommandList.Num() > 0)
+			{
+				if (PlayerController->CommandList.Last().Location != LastCommand.Location)
+				{
+					MoveToCommand(PlayerController->CommandList.Last()); //Get the most recent command and prepare to move to it.
 
+				}
+			}
+
+			if (FVector::Distance(GetCharacter()->GetActorLocation(), PlayerController->GetPawn()->GetActorLocation()) >= 1000.0f)
+			{
+				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
+				FollowPlayer();
+
+			}
 		}
 	}
 }
 
 void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they receive a new command, move to it.
 {
-	UE_LOG(LogTemp, Warning, TEXT("Destination: %s"), *CommandPoint.Location.ToString());
-	if (CommandPoint.Type == FName("Target"))
+	if (TheBlackboard)
 	{
-		if (this->GetPawn()->Implements<USquadInterface>())
+		UE_LOG(LogTemp, Warning, TEXT("Destination: %s"), *CommandPoint.Location.ToString());
+		if (CommandPoint.Type == FName("Target"))
 		{
-			if (CommandPoint.OwnerActor != nullptr)
+			if (this->GetPawn()->Implements<USquadInterface>())
 			{
-				ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
-				return;
+				if (CommandPoint.OwnerActor != nullptr)
+				{
+					ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
+					return;
+				}
 			}
 		}
-	}
-	if (CommandPoint.Type == FName("Return"))
-	{
-		ResetPriorityCommand();
-	}
-	if (bHasPriority == true)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("HasPriority"));
-		return;
-	}
-	if (CommandPoint.Location.X == 0.00f)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
-		return;
-	}
-	bShouldFollow = false;
-	if (GetCharacter()->bIsCrouched)
-	{
-		GetCharacter()->UnCrouch();
+		if (CommandPoint.Type == FName("Return"))
+		{
+			ResetPriorityCommand();
+		}
+		if (TheBlackboard->GetValueAsBool(FName("bHasPriority")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HasPriority"));
+			return;
+		}
+		if (CommandPoint.Location.X == 0.00f)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
+			return;
+		}
+		if (TheBlackboard)
+		{
+			TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
+		}
+		if (GetCharacter()->bIsCrouched)
+		{
+			GetCharacter()->UnCrouch();
 
+		}
+		MoveToLocation(CommandPoint.Location, 0);
+		HandleCommand(CommandPoint);
+		LastCommand = CommandPoint;
 	}
-	MoveToLocation(CommandPoint.Location, 0);
-	HandleCommand(CommandPoint);
-	LastCommand = CommandPoint;
 
 }
 
 void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if they need to crouch, suppress, etc.
 {
-	//Called when AIController reached their destination
-	FTimerDelegate Delegate;
-	Delegate.BindUFunction(this, "HandleCommand", CommandPoint);
-	float DistanceThreshold = 150.0f;
-	float DistanceToCommand = FVector::Distance(GetPawn()->GetActorLocation(), CommandPoint.Location);
-	if (DistanceToCommand <= DistanceThreshold)
+	if (TheBlackboard)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Distance threshold met."));
-		StopMovement();
-		if (CommandPoint.Type == FName("Cover")) // trying to convert this to switch statement
+		//Called when AIController reached their destination
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "HandleCommand", CommandPoint);
+		float DistanceThreshold = 150.0f;
+		float DistanceToCommand = FVector::Distance(GetPawn()->GetActorLocation(), CommandPoint.Location);
+		if (DistanceToCommand <= DistanceThreshold)
 		{
-			GetCharacter()->Crouch();
+			UE_LOG(LogTemp, Warning, TEXT("Distance threshold met."));
+			StopMovement();
+			if (CommandPoint.Type == FName("Cover")) // trying to convert this to switch statement
+			{
+				GetCharacter()->Crouch();
+
+			}
+			if (CommandPoint.Type == FName("Return"))
+			{
+				ResetPriorityCommand();
+				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
+			}
+			Delegate.Unbind();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Setting delegate"));
+			GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 2000.0f, false, 0.0f);
 
 		}
-		if (CommandPoint.Type == FName("Return"))
-		{
-			ResetPriorityCommand();
-			bShouldFollow = true;
-		}
-		Delegate.Unbind();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Setting delegate"));
-		GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 2000.0f, false, 0.0f);
-
 	}
 }
 
@@ -146,7 +160,7 @@ void ASquadAIController::FollowPlayer()
 	FTimerDelegate Delegate;
 	Delegate.BindUFunction(this, "FollowPlayer");
 	MoveToLocation(PlayerController->GetPawn()->GetActorLocation(), 200);
-	GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 0.5f, bShouldFollow, 0.0f);
+	GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 0.5f, TheBlackboard->GetValueAsBool(FName("bShouldFollow")), 0.0f);
 	Delegate.Unbind();
 }
 
@@ -164,30 +178,38 @@ void ASquadAIController::SetupPerceptionSystem()
 
 void ASquadAIController::ClearRoom()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ClearRoom start"));
-	if (Room != nullptr)
+	if (TheBlackboard)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Room != nullptr"));
-		bShouldFollow = false;
-		FCommandPoint RoomPoint;
-		FVector Test = Room->GetActorLocation();
-		RoomPoint.Location = Room->GetActorLocation();
-		RoomPoint.Type = FName("Cover");
-		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "ClearRoom");
-		MoveToCommand(RoomPoint);
-		float DistanceThreshold = 150.0f;
-		float DistanceToCommand = FVector::Distance(GetPawn()->GetActorLocation(), RoomPoint.Location);
-		if (DistanceToCommand <= DistanceThreshold)
+		UE_LOG(LogTemp, Warning, TEXT("ClearRoom start"));
+		if (TheBlackboard->GetValueAsObject(FName("Room")) != nullptr)
 		{
-			bShouldFollow = true;
-			Delegate.Unbind();
+			UObject* RoomObject = TheBlackboard->GetValueAsObject(FName("Room"));
+			ARoom* Room = Cast<ARoom>(RoomObject);
+			if (Room)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Room != nullptr"));
+				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
+				FCommandPoint RoomPoint;
+				FVector Test = Room->GetActorLocation();
+				RoomPoint.Location = Room->GetActorLocation();
+				RoomPoint.Type = FName("Cover");
+				FTimerDelegate Delegate;
+				Delegate.BindUFunction(this, "ClearRoom");
+				MoveToCommand(RoomPoint);
+				float DistanceThreshold = 150.0f;
+				float DistanceToCommand = FVector::Distance(GetPawn()->GetActorLocation(), RoomPoint.Location);
+				if (DistanceToCommand <= DistanceThreshold)
+				{
+					TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
+					Delegate.Unbind();
 
-		}
-		else
-		{
-			GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 5.0f, false, 5.0f);
+				}
+				else
+				{
+					GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 5.0f, false, 5.0f);
 
+				}
+			}
 		}
 	}
 
@@ -205,13 +227,13 @@ void ASquadAIController::ResetPriorityCommand()
 		}
 	}
 	AssignedPosition = nullptr;
-	bShouldFollow = true;
-	bHasPriority = false;
-	UBlackboardComponent* newBlackboard = this->GetBlackboardComponent();
-	if (newBlackboard)
+	if (TheBlackboard)
 	{
-		newBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
+		TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
+		TheBlackboard->SetValueAsBool(FName("bHasPriority"), false);
+		TheBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
 	}
+	
 	return;
 }
 void ASquadAIController::OnUpdated(AActor* NewActor)
