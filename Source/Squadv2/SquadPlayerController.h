@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "SquadAIController.h"
 #include "SquadPlayerController.generated.h"
 
 /**
