@@ -10,7 +10,7 @@
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class USquadInterface : public UInterface
+class UAssignMemberInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -18,7 +18,7 @@ class USquadInterface : public UInterface
 /**
  *
  */
-class SQUADV2_API ISquadInterface
+class SQUADV2_API IAssignMemberInterface
 {
 	GENERATED_BODY()
 

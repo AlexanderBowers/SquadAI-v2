@@ -17,9 +17,9 @@
 void ASquadAIController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (this->GetPawn()->Implements<USquadInterface>())
+	//if (this->GetPawn()->Implements<USquadInterface>())
 	{
-		ISquadInterface::Execute_SetBehaviorTree(this->GetPawn(), this);
+		//ISquadInterface::Execute_SetBehaviorTree(this->GetPawn(), this);
 	}
 	if (GetWorld()->GetFirstPlayerController())
 	{
@@ -68,11 +68,11 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 	UE_LOG(LogTemp, Warning, TEXT("Destination: %s"), *CommandPoint.Location.ToString());
 	if (CommandPoint.Type == FName("Target"))
 	{
-		if (this->GetPawn()->Implements<USquadInterface>())
+		//if (this->GetPawn()->Implements<USquadInterface>())
 		{
 			if (CommandPoint.OwnerActor != nullptr)
 			{
-				ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
+				//ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
 				return;
 			}
 		}
@@ -199,9 +199,9 @@ void ASquadAIController::ResetPriorityCommand()
 	PriorityCommand.Location = ResetLocation;
 	if (AssignedPosition)
 	{
-		if (AssignedPosition->Implements<USquadInterface>())
+		//if (AssignedPosition->Implements<USquadInterface>())
 		{
-			ISquadInterface::Execute_ResetAssignedMember(AssignedPosition);
+			//ISquadInterface::Execute_ResetAssignedMember(AssignedPosition);
 		}
 	}
 	AssignedPosition = nullptr;
@@ -216,9 +216,9 @@ void ASquadAIController::ResetPriorityCommand()
 }
 void ASquadAIController::OnUpdated(AActor* NewActor)
 {
-	if (Implements<USquadInterface>())
+	//if (Implements<USquadInterface>())
 	{
-		ISquadInterface::Execute_UpdatePerception(this->GetPawn(), NewActor);
+		//ISquadInterface::Execute_UpdatePerception(this->GetPawn(), NewActor);
 	}
 }
 
