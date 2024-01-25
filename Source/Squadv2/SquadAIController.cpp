@@ -174,7 +174,7 @@ void ASquadAIController::SetupPerceptionSystem()
 
 }
 
-void ASquadAIController::ClearRoom()
+void ASquadAIController::ClearRoom(FVector RoomLocation)
 {
 	if (TheBlackboard)
 	{
@@ -188,8 +188,7 @@ void ASquadAIController::ClearRoom()
 				UE_LOG(LogTemp, Warning, TEXT("Room != nullptr"));
 				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
 				FCommandPoint RoomPoint;
-				FVector Test = Room->GetActorLocation();
-				RoomPoint.Location = Room->GetActorLocation();
+				RoomPoint.Location = RoomLocation;
 				RoomPoint.Type = FName("Cover");
 				FTimerDelegate Delegate;
 				Delegate.BindUFunction(this, "ClearRoom");

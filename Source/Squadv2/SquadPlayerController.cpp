@@ -172,7 +172,7 @@ void ASquadPlayerController::AssignRoom(ARoom* Room)
 				{
 					Room->AssignedSquadMember = Commando;
 					Blackboard->SetValueAsObject(FName("Room"), Room);
-					Commando->ClearRoom();
+					Commando->ClearRoom(Room->GetActorLocation());
 					return;
 				}
 			}

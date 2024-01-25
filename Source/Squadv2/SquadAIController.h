@@ -33,7 +33,7 @@ public:
 	UBlackboardComponent* TheBlackboard;
 
 	UFUNCTION()
-	void ClearRoom();
+	void ClearRoom(FVector RoomLocation);
 	UFUNCTION()
 	void MoveToCommand(FCommandPoint CommandPoint);
 
