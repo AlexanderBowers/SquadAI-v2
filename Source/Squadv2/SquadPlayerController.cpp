@@ -308,6 +308,14 @@ void ASquadPlayerController::FormUpCommand() //Generic recall function to return
 		CommandPoint.Location = ControlledPawn->GetActorLocation();
 		CommandPoint.Type = FName("Return");
 		CommandList.Add(CommandPoint);
+		for (AActor* AI : SquadMembers)
+		{
+			ASquadAIController* Commando = Cast<ASquadAIController>(AI);
+			if (Commando)
+			{
+				Commando->MoveToCommand(CommandPoint);
+			}
+		}
 		DrawDebugSphere(GetWorld(), ControlledPawn->GetActorLocation(), 20, 20, FColor::Purple, false, 2, 0, 1.f);
 
 	}
