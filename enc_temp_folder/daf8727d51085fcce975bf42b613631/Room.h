@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SquadAIController.h"
+//#include "SquadAIController.h"
 #include "Room.generated.h"
 
 UCLASS()
@@ -18,8 +18,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 	bool bIsCleared = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
-	ASquadAIController* AssignedSquadMember;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+	//ASquadAIController* AssignedSquadMember;
 
 protected:
 	// Called when the game starts or when spawned

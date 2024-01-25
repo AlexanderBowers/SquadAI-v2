@@ -262,9 +262,9 @@ void ASquadPlayerController::Tick(float DeltatTime)
 
 void ASquadPlayerController::FireProjectile()
 {
-	if (Implements<USquadInterface>())
+	if (Implements<UAssignMemberInterface>())
 	{
-		ISquadInterface::Execute_FireProjectile(this);
+		IAssignMemberInterface::Execute_FireProjectile(this);
 	}
 }
 
