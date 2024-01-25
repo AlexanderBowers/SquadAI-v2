@@ -167,9 +167,9 @@ void ASquadAIController::SetupPerceptionSystem()
 
 void ASquadAIController::ClearRoom(FVector RoomLocation)
 {
+	//Check if the controller has a room assigned. Move there, wait 5 seconds, then return to the player. 
 	if (TheBlackboard)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ClearRoom start"));
 		if (TheBlackboard->GetValueAsObject(FName("Room")) != nullptr)
 		{
 			UObject* RoomObject = TheBlackboard->GetValueAsObject(FName("Room"));
@@ -181,23 +181,24 @@ void ASquadAIController::ClearRoom(FVector RoomLocation)
 				FCommandPoint RoomPoint;
 				RoomPoint.Location = RoomLocation;
 				RoomPoint.Type = FName("Cover");
-				FTimerDelegate Delegate;
-				Delegate.BindUFunction(this, "ClearRoom");
 				MoveToCommand(RoomPoint);
-				float DistanceThreshold = 150.0f;
-				float DistanceToCommand = FVector::Distance(GetPawn()->GetActorLocation(), RoomPoint.Location);
-				if (DistanceToCommand <= DistanceThreshold)
-				{
-					TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
-					Delegate.Unbind();
-
-				}
-				else
-				{
-					GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 5.0f, false, 5.0f);
-
-				}
+				
 			}
+		}
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "ClearRoom", RoomLocation);
+		float DistanceThreshold = 500.0f;
+		float DistanceToCommand = FVector::Distance(this->GetPawn()->GetActorLocation(), RoomLocation);
+		if (DistanceToCommand <= DistanceThreshold)
+		{
+			TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
+			Delegate.Unbind();
+
+		}
+		else
+		{
+			GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 5.0f, false, 5.0f);
+
 		}
 	}
 
