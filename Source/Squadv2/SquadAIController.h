@@ -40,9 +40,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetPriorityCommand();
 
-	UFUNCTION(BlueprintCallable)
-	void OnUpdated(AActor* NewActor);
-
 
 
 protected:
@@ -69,7 +66,6 @@ private:
 	UPROPERTY()
 	FTimerHandle TimerHandle;
 
-	void SetupPerceptionSystem();
 
 
 };

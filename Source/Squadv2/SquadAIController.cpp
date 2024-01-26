@@ -18,10 +18,6 @@
 void ASquadAIController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (this->GetPawn()->Implements<USquadInterface>())
-	{
-		ISquadInterface::Execute_SetBehaviorTree(this->GetPawn(), this);
-	}
 	if (GetWorld()->GetFirstPlayerController())
 	{
 		PlayerController = GetWorld()->GetFirstPlayerController<ASquadPlayerController>();
@@ -153,18 +149,6 @@ void ASquadAIController::FollowPlayer()
 	Delegate.Unbind();
 }
 
-void ASquadAIController::SetupPerceptionSystem()
-{
-	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
-	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception Component")));
-	SightConfig->SightRadius = 5000.0f;
-
-	GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
-	//GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ASquadAIController::OnUpdated);
-	GetPerceptionComponent()->ConfigureSense(*SightConfig);
-
-}
-
 void ASquadAIController::ClearRoom(FVector RoomLocation)
 {
 	//Check if the controller has a room assigned. Move there, wait 5 seconds, then return to the player. 
@@ -224,13 +208,6 @@ void ASquadAIController::ResetPriorityCommand()
 	}
 	
 	return;
-}
-void ASquadAIController::OnUpdated(AActor* NewActor)
-{
-	if (Implements<USquadInterface>())
-	{
-		ISquadInterface::Execute_UpdatePerception(this->GetPawn(), NewActor);
-	}
 }
 
 
