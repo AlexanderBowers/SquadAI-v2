@@ -45,10 +45,9 @@ void ASquadAIController::Tick(float DeltaTime)
 
 			}
 
-			if (FVector::Distance(GetCharacter()->GetActorLocation(), PlayerController->GetPawn()->GetActorLocation()) >= 1000.0f)
+			if (FVector::Distance(GetCharacter()->GetActorLocation(), PlayerController->GetPawn()->GetActorLocation()) >= 2000.0f)
 			{
-				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
-				FollowPlayer();
+				ResetPriorityCommand();
 
 			}
 		}
@@ -60,39 +59,37 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 	if (TheBlackboard)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Destination: %s"), *CommandPoint.Location.ToString());
-		if (LastCommand.Location != CommandPoint.Location)
+
+		if (CommandPoint.Type == FName("Target"))
 		{
-			if (CommandPoint.Type == FName("Target"))
+			if (this->GetPawn()->Implements<USquadInterface>())
 			{
-				if (this->GetPawn()->Implements<USquadInterface>())
+				if (CommandPoint.OwnerActor != nullptr)
 				{
-					if (CommandPoint.OwnerActor != nullptr)
-					{
-						ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
-						return;
-					}
+					ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
+					return;
 				}
 			}
-			if (CommandPoint.Type == FName("Return"))
-			{
-				ResetPriorityCommand();
-			}
-			if (CommandPoint.Location.X == 0.00f)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
-				return;
-			}
-\
-			if (GetCharacter()->bIsCrouched)
-			{
-				GetCharacter()->UnCrouch();
-
-			}
-			TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
-			MoveToLocation(CommandPoint.Location, 0);
-			HandleCommand(CommandPoint);
-			LastCommand = CommandPoint;
 		}
+		if (CommandPoint.Type == FName("Return"))
+		{
+			ResetPriorityCommand();
+		}
+		if (CommandPoint.Location.X == 0.00f)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
+			return;
+		}
+\
+		if (GetCharacter()->bIsCrouched)
+		{
+			GetCharacter()->UnCrouch();
+
+		}
+		TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
+		MoveToLocation(CommandPoint.Location, 0);
+		HandleCommand(CommandPoint);
+		LastCommand = CommandPoint;
 	}
 
 }
@@ -184,7 +181,10 @@ void ASquadAIController::ClearRoom(FVector RoomLocation)
 
 void ASquadAIController::ResetPriorityCommand()
 {
-	AssignedPosition = Cast<AActor>(TheBlackboard->GetValueAsObject(FName("AssignedPosition")));
+	if (TheBlackboard->GetValueAsObject(FName("AssignedPosition")))
+	{
+		AssignedPosition = Cast<AActor>(TheBlackboard->GetValueAsObject(FName("AssignedPosition")));
+	}
 	if (AssignedPosition)
 	{
 		if (TheBlackboard->GetValueAsObject(FName("AssignedPosition"))->Implements<USquadInterface>())
