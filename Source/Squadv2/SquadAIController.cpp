@@ -77,24 +77,18 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 			{
 				ResetPriorityCommand();
 			}
-			if (TheBlackboard->GetValueAsBool(FName("bIsAssigned")))
-			{
-				return;
-			}
 			if (CommandPoint.Location.X == 0.00f)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
 				return;
 			}
-			if (TheBlackboard)
-			{
-				TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
-			}
+\
 			if (GetCharacter()->bIsCrouched)
 			{
 				GetCharacter()->UnCrouch();
 
 			}
+			TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
 			MoveToLocation(CommandPoint.Location, 0);
 			HandleCommand(CommandPoint);
 			LastCommand = CommandPoint;
@@ -190,22 +184,19 @@ void ASquadAIController::ClearRoom(FVector RoomLocation)
 
 void ASquadAIController::ResetPriorityCommand()
 {
-	FVector ResetLocation = { 0.00f, 0.00f, 0.00f };
-	PriorityCommand.Location = ResetLocation;
+	AssignedPosition = Cast<AActor>(TheBlackboard->GetValueAsObject(FName("AssignedPosition")));
 	if (AssignedPosition)
 	{
-		if (AssignedPosition->Implements<USquadInterface>())
+		if (TheBlackboard->GetValueAsObject(FName("AssignedPosition"))->Implements<USquadInterface>())
 		{
 			ISquadInterface::Execute_ResetAssignedMember(AssignedPosition);
 		}
+		TheBlackboard->SetValueAsObject(FName("AssignedPosition"), nullptr);
 	}
 	AssignedPosition = nullptr;
-	if (TheBlackboard)
-	{
-		TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
-		TheBlackboard->SetValueAsBool(FName("bHasPriority"), false);
-		TheBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
-	}
+	TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
+	TheBlackboard->SetValueAsBool(FName("bHasPriority"), false);
+	TheBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
 	
 	return;
 }

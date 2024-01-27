@@ -34,7 +34,7 @@ public:
 
 	UFUNCTION()
 	void ClearRoom(FVector RoomLocation);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void MoveToCommand(FCommandPoint CommandPoint);
 
 	UFUNCTION(BlueprintCallable)
