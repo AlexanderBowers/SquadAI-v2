@@ -228,12 +228,14 @@ ASquadAIController* ASquadPlayerController::GetAvailableMember(FCommandPoint Com
 		ASquadAIController* SquadMember = Cast<ASquadAIController>(Actor);
 		if (SquadMember)
 		{
-			//if (SquadMember->PriorityCommand.Location.X == 0.00)
+			UBlackboardComponent* Blackboard = SquadMember->GetBlackboardComponent();
+			if (!Blackboard->GetValueAsBool(FName("bIsAssigned")))
 			{
 				FVector MemberLocation = SquadMember->GetCharacter()->GetActorLocation();
 				if (FVector::Distance(MemberLocation, CommandLocation) <= BestDistance)
 				{
 					BestDistance = FVector::Distance(MemberLocation, CommandLocation);
+
 					ClosestMember = SquadMember;
 				}
 			}
@@ -241,16 +243,16 @@ ASquadAIController* ASquadPlayerController::GetAvailableMember(FCommandPoint Com
 	}
 	if (ClosestMember) //AIController gets all the info he needs to move to the spot. Assignment of AssignedLocation pointer set in the CheckAssignedMember event.
 	{
-		//ClosestMember->PriorityCommand.Location = CommandPoint.Location;
-		//ClosestMember->PriorityCommand.Type = CommandPoint.Type;
-		//ClosestMember->MoveToCommand(CommandPoint);
 		UBlackboardComponent* Blackboard = ClosestMember->GetBlackboardComponent();
 		if (Blackboard)
 		{
+		
+			UE_LOG(LogTemp, Warning, TEXT("bIsAssigned == false"));
 			Blackboard->SetValueAsBool(FName("bIsAssigned"), true);
 			Blackboard->SetValueAsVector(FName("AssignedLocation"), CommandPoint.Location);
 			UE_LOG(LogTemp, Warning, TEXT("found closest member."));
 			ClosestMember->MoveToCommand(CommandPoint);
+			
 		}
 		return ClosestMember;
 	}
