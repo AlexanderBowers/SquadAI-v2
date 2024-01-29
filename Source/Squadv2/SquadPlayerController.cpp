@@ -51,6 +51,7 @@ FCommandPoint ASquadPlayerController::AssignLocation(FCommandPoint CommandPoint,
 FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHitResult HitResult)
 { //CommandPoints can have a variety of types. 
   //Move: self explanatory. This is the default fallback.
+  //Target: All squad members should set this to their target actor.
   //Detonate: One AI temporarily has this set as a priority. They will place a bomb then return. Selecting this again will blow up the object.
   //Cover: crouch at location; this is set in SquadAIController::HandleCommand
   //Investigate: CommandPoint.Location gets set to a specific component.
@@ -78,11 +79,15 @@ FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHi
 						if (BombPoint)
 						{
 							ISquadInterface::Execute_CheckAssignedMember(Actor, CommandPoint);
-							CommandPoint.Location.X = 0.00f;
+							CommandPoint.Location.X = 0.00f; //prevents squad members who didn't receive the assignment from moving to it.
 						}
 					}
 				}
-
+				if (CommandPoint.Type == FName("Target"))
+				{
+					SetNewAITarget(Actor);
+					CommandPoint.Location.X = 0.00f;
+				}
 				if (CommandPoint.Type == FName("Investigate")) //Grab a static mesh called EndLocation on the actor. That will be the new location to move to.
 				{
 					UStaticMeshComponent* EndLocation = Cast<UStaticMeshComponent>(Actor->GetDefaultSubobjectByName(TEXT("EndLocation")));
@@ -91,7 +96,6 @@ FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHi
 						FVector RightLocation = EndLocation->GetComponentLocation();
 						CommandPoint.Location = RightLocation;
 						return CommandPoint;
-
 					}
 				}
 				if (CommandPoint.Type == FName("FirePoint"))
@@ -107,14 +111,12 @@ FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHi
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Found Component but not tag!"))
 					CommandPoint.Type = FName("Move");
-
 			}
 		}
 		else //If there is no component, default the type to move.
 		{
 			CommandPoint.Type = FName("Move");
 			DrawDebugSphere(GetWorld(), HitResult.Location, 20, 8, FColor::Red, false, 2, 0, 1.f);
-
 		}
 		return CommandPoint;
 
@@ -258,6 +260,22 @@ ASquadAIController* ASquadPlayerController::GetAvailableMember(FCommandPoint Com
 	}
 	UE_LOG(LogTemp, Warning, TEXT("No member found! returning nullptr"));
 	return nullptr;
+}
+
+void ASquadPlayerController::SetNewAITarget(AActor* NewTarget)
+{
+	for (AActor* Actor : SquadMembers)
+	{
+		ASquadAIController* SquadMember = Cast<ASquadAIController>(Actor);
+		if (SquadMember)
+		{
+			UBlackboardComponent* Blackboard = SquadMember->GetBlackboardComponent();
+			if (Blackboard)
+			{
+				Blackboard->SetValueAsObject(FName("TargetActor"), NewTarget);
+			}
+		}
+	}
 }
 
 void ASquadPlayerController::Tick(float DeltatTime)

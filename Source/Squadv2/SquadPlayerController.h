@@ -53,6 +53,8 @@ public:
 	void AssignPriorityCommand(FCommandPoint CommandPoint);
 	UFUNCTION(BlueprintCallable)
 	ASquadAIController* GetAvailableMember(FCommandPoint CommandPoint);
+	UFUNCTION()
+	void SetNewAITarget(AActor* NewTarget);
 
 
 	virtual void Tick(float DeltatTime) override;
