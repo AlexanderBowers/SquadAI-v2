@@ -87,7 +87,7 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 
 		}
 		TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
-		MoveToLocation(CommandPoint.Location, 0);
+		MoveToLocation(CommandPoint.Location, 100);
 		HandleCommand(CommandPoint);
 		LastCommand = CommandPoint;
 	}
