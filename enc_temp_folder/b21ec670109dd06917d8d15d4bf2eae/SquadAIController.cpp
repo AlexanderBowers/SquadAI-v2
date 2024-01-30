@@ -103,7 +103,6 @@ void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if th
 		Delegate.BindUFunction(this, "HandleCommand", CommandPoint);
 		float DistanceThreshold = 150.0f;
 		float DistanceToCommand = FVector::Distance(GetPawn()->GetActorLocation(), CommandPoint.Location);
-		TheBlackboard->SetValueAsBool(FName("bIsMovingToCommand"), true);
 		if (DistanceToCommand <= DistanceThreshold)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Distance threshold met."));
