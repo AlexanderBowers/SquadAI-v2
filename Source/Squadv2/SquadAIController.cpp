@@ -120,7 +120,7 @@ void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if th
 		}
 		else
 		{
-			GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 200.0f, false, 0.0f);
+			GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 1.0f, false, 0.0f);
 
 		}
 	}
