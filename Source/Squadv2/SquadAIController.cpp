@@ -62,11 +62,11 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 
 		if (CommandPoint.Type == FName("Target"))
 		{
-			if (this->GetPawn()->Implements<USquadInterface>())
+			if (GetPawn()->Implements<USquadInterface>())
 			{
 				if (CommandPoint.OwnerActor != nullptr)
 				{
-					ISquadInterface::Execute_SetNewTarget(this->GetPawn(), CommandPoint.OwnerActor);
+					ISquadInterface::Execute_SetNewTarget(GetPawn(), CommandPoint.OwnerActor);
 					return;
 				}
 			}
@@ -77,7 +77,7 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 		}
 		if (CommandPoint.Location.X == 0.00f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("BadLocation."));
+			UE_LOG(LogTemp, Warning, TEXT("0.00f; command was likely an assignment."));
 			return;
 		}
 \
@@ -89,7 +89,6 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 		TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
 		MoveToLocation(CommandPoint.Location, 100);
 		HandleCommand(CommandPoint);
-		LastCommand = CommandPoint;
 	}
 
 }
@@ -101,7 +100,7 @@ void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if th
 		//Called when AIController reached their destination
 		FTimerDelegate Delegate;
 		Delegate.BindUFunction(this, "HandleCommand", CommandPoint);
-		float DistanceThreshold = 150.0f;
+		float DistanceThreshold = 100.0f;
 		float DistanceToCommand = FVector::Distance(GetPawn()->GetActorLocation(), CommandPoint.Location);
 		TheBlackboard->SetValueAsBool(FName("bIsMovingToCommand"), true);
 		if (DistanceToCommand <= DistanceThreshold)
@@ -129,16 +128,19 @@ void ASquadAIController::HandleCommand(FCommandPoint CommandPoint) //Check if th
 
 void ASquadAIController::FollowPlayer()
 {
-	if (GetCharacter()->bIsCrouched)
+	if (TheBlackboard)
 	{
-		GetCharacter()->UnCrouch();
+		if (GetCharacter()->bIsCrouched)
+		{
+			GetCharacter()->UnCrouch();
 
+		}
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "FollowPlayer");
+		MoveToLocation(PlayerController->GetPawn()->GetActorLocation(), 200);
+		GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 0.5f, TheBlackboard->GetValueAsBool(FName("bShouldFollow")), 0.0f);
+		Delegate.Unbind();
 	}
-	FTimerDelegate Delegate;
-	Delegate.BindUFunction(this, "FollowPlayer");
-	MoveToLocation(PlayerController->GetPawn()->GetActorLocation(), 200);
-	GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 0.5f, TheBlackboard->GetValueAsBool(FName("bShouldFollow")), 0.0f);
-	Delegate.Unbind();
 }
 
 void ASquadAIController::ClearRoom(FVector RoomLocation)

@@ -85,7 +85,7 @@ FCommandPoint ASquadPlayerController::AssignType(FCommandPoint CommandPoint, FHi
 				}
 				if (CommandPoint.Type == FName("Target"))
 				{
-					SetNewAITarget(Actor);
+					//SetNewAITarget(Actor);
 					CommandPoint.Location.X = 0.00f;
 				}
 				if (CommandPoint.Type == FName("Investigate")) //Grab a static mesh called EndLocation on the actor. That will be the new location to move to.
@@ -309,7 +309,6 @@ void ASquadPlayerController::MoveUpCommand()
 		{
 			//CreateCommandPointy checks to see if the hitresult actor has a Command Component and its type.
 			FCommandPoint CommandPoint = CreateCommandPoint(HitResult);
-			CommandList.Add(CommandPoint);
 			for (AActor* AI : SquadMembers)
 			{
 				ASquadAIController* Commando = Cast<ASquadAIController>(AI);
@@ -328,16 +327,12 @@ void ASquadPlayerController::FormUpCommand() //Generic recall function to return
 {
 	if (ControlledPawn)
 	{
-		FCommandPoint CommandPoint;
-		CommandPoint.Location = ControlledPawn->GetActorLocation();
-		CommandPoint.Type = FName("Return");
-		CommandList.Add(CommandPoint);
 		for (AActor* AI : SquadMembers)
 		{
 			ASquadAIController* Commando = Cast<ASquadAIController>(AI);
 			if (Commando)
 			{
-				Commando->MoveToCommand(CommandPoint);
+				Commando->ResetPriorityCommand();
 			}
 		}
 		DrawDebugSphere(GetWorld(), ControlledPawn->GetActorLocation(), 20, 20, FColor::Purple, false, 2, 0, 1.f);
