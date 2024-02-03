@@ -327,7 +327,7 @@ void ASquadPlayerController::FormUpCommand() //Generic recall function to return
 {
 	if (ControlledPawn)
 	{
-		for (AActor* AI : SquadMembers)
+		/*for (AActor* AI : SquadMembers)
 		{
 			ASquadAIController* Commando = Cast<ASquadAIController>(AI);
 			if (Commando)
@@ -335,7 +335,11 @@ void ASquadPlayerController::FormUpCommand() //Generic recall function to return
 				Commando->ResetPriorityCommand();
 			}
 		}
-		DrawDebugSphere(GetWorld(), ControlledPawn->GetActorLocation(), 20, 20, FColor::Purple, false, 2, 0, 1.f);
+		DrawDebugSphere(GetWorld(), ControlledPawn->GetActorLocation(), 20, 20, FColor::Purple, false, 2, 0, 1.f);*/
+		if (this->Implements<USquadInterface>())
+		{
+			ISquadInterface::Execute_ResetAssignedMember(this);
+		}
 
 	}
 }

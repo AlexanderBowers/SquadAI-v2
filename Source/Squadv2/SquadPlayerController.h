@@ -71,7 +71,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FCommandPoint> CommandList;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<AActor*> SquadMembers;
 	TArray<AActor*> RoomsInBuilding;
 

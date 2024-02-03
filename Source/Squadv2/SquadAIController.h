@@ -26,7 +26,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	FCommandPoint PriorityCommand;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* AssignedPosition;
+	UObject* AssignedPosition;
 
 
 	UPROPERTY(VisibleAnywhere)
