@@ -253,7 +253,6 @@ ASquadAIController* ASquadPlayerController::GetAvailableMember(FCommandPoint Com
 			Blackboard->SetValueAsBool(FName("bIsAssigned"), true);
 			Blackboard->SetValueAsVector(FName("AssignedLocation"), CommandPoint.Location);
 			UE_LOG(LogTemp, Warning, TEXT("found closest member."));
-			ClosestMember->ResetFollow();
 			ClosestMember->MoveToCommand(CommandPoint);
 			
 		}
@@ -316,11 +315,8 @@ void ASquadPlayerController::MoveUpCommand()
 				if (Commando)
 				{
 					UBlackboardComponent* Blackboard = Commando->GetBlackboardComponent();
-					if (!Blackboard->GetValueAsBool(FName("bIsAssigned")))
-					{
-						Commando->ResetFollow();
+					if(!Blackboard->GetValueAsBool(FName("bIsAssigned")))
 						Commando->MoveToCommand(CommandPoint);
-					}
 				}
 			}
 		}
