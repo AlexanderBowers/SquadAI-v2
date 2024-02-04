@@ -232,6 +232,28 @@ void ASquadAIController::ResetPriorityCommand()
 	return;
 }
 
+void ASquadAIController::ResetFollow()
+{
+	if (TheBlackboard->GetValueAsObject(FName("AssignedPosition")))
+	{
+		AssignedPosition = Cast<AActor>(TheBlackboard->GetValueAsObject(FName("AssignedPosition")));
+	}
+	if (AssignedPosition)
+	{
+		if (TheBlackboard->GetValueAsObject(FName("AssignedPosition"))->Implements<USquadInterface>())
+		{
+			ISquadInterface::Execute_ResetAssignedMember(AssignedPosition);
+		}
+		TheBlackboard->SetValueAsObject(FName("AssignedPosition"), nullptr);
+	}
+	AssignedPosition = nullptr;
+	TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
+	TheBlackboard->SetValueAsBool(FName("bHasPriority"), false);
+	TheBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
+
+	return;
+}
+
 
 
 //TODO: Allow multiple Squad AI to respond to command. DONE!

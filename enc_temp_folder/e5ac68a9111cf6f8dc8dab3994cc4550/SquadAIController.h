@@ -40,8 +40,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetPriorityCommand();
 
-	UFUNCTION(BlueprintCallable)
-	void ResetFollow();
 
 
 protected:
