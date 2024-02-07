@@ -231,8 +231,9 @@ ASquadAIController* ASquadPlayerController::GetAvailableMember(FCommandPoint Com
 		if (SquadMember)
 		{
 			UBlackboardComponent* Blackboard = SquadMember->GetBlackboardComponent();
-			if (!Blackboard->GetValueAsBool(FName("bIsAssigned")))
+			if (!Blackboard->GetValueAsBool(FName("bIsAssigned"))) //Verify the Squad member currently doesn't have an active assignment.
 			{
+				UE_LOG(LogTemp, Warning, TEXT("%s is unassigned"), *SquadMember->GetName());
 				FVector MemberLocation = SquadMember->GetCharacter()->GetActorLocation();
 				if (FVector::Distance(MemberLocation, CommandLocation) <= BestDistance)
 				{
@@ -248,12 +249,13 @@ ASquadAIController* ASquadPlayerController::GetAvailableMember(FCommandPoint Com
 		UBlackboardComponent* Blackboard = ClosestMember->GetBlackboardComponent();
 		if (Blackboard)
 		{
-		
-			UE_LOG(LogTemp, Warning, TEXT("bIsAssigned == false"));
-			Blackboard->SetValueAsBool(FName("bIsAssigned"), true);
+			Blackboard->SetValueAsBool(FName("bIsAssigned"), true); //Marking as having an assignment so they won't be given one until it's reset. 
+			UE_LOG(LogTemp, Warning, TEXT("bIsAssigned value: %d"), Blackboard->GetValueAsBool(FName("bIsAssigned")));
 			Blackboard->SetValueAsVector(FName("AssignedLocation"), CommandPoint.Location);
-			UE_LOG(LogTemp, Warning, TEXT("found closest member."));
-			ClosestMember->ResetFollow();
+			UE_LOG(LogTemp, Warning, TEXT("found closest unassigned member: %s"), *ClosestMember->GetName());
+			Blackboard->SetValueAsBool(FName("bShouldFollow"), false);
+			^^^ This was originally ClosestMember->ResetFollow(). ResetFollow needs to be retweaked.
+				if(bShouldFollow -> ResetPriorityCommand on the squad location. if false -> bShouldFollow and get assigned a squadlocation.)
 			ClosestMember->MoveToCommand(CommandPoint);
 			
 		}

@@ -58,7 +58,7 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 {
 	if (TheBlackboard)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Destination: %s"), *CommandPoint.Location.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("Destination: %s"), *CommandPoint.Location.ToString());
 
 		if (CommandPoint.Type == FName("Target"))
 		{
@@ -77,7 +77,6 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 		}
 		if (CommandPoint.Location.X == 0.00f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("0.00f; command was likely an assignment."));
 			return;
 		}
 \
@@ -247,7 +246,7 @@ void ASquadAIController::ResetFollow()
 		TheBlackboard->SetValueAsObject(FName("AssignedPosition"), nullptr);
 	}
 	AssignedPosition = nullptr;
-	TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
+	TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
 	TheBlackboard->SetValueAsBool(FName("bHasPriority"), false);
 	TheBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
 
