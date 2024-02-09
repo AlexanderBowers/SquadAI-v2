@@ -157,6 +157,7 @@ void ASquadAIController::FollowPlayer()
 			}
 			if (DistanceToCommand <= DistanceThreshold)
 			{
+				TheBlackboard->SetValueAsBool(FName("bIsMovingToCommand"), false);
 				Delegate.Unbind();
 
 			}
@@ -233,6 +234,8 @@ void ASquadAIController::ResetPriorityCommand()
 
 void ASquadAIController::ResetFollow()
 {
+	TheBlackboard->SetValueAsBool(FName("bShouldFollow"), !TheBlackboard->GetValueAsBool(FName("bShouldFollow")));
+
 	if (TheBlackboard->GetValueAsObject(FName("AssignedPosition")))
 	{
 		AssignedPosition = Cast<AActor>(TheBlackboard->GetValueAsObject(FName("AssignedPosition")));
@@ -246,7 +249,6 @@ void ASquadAIController::ResetFollow()
 		TheBlackboard->SetValueAsObject(FName("AssignedPosition"), nullptr);
 	}
 	AssignedPosition = nullptr;
-	TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
 	TheBlackboard->SetValueAsBool(FName("bHasPriority"), false);
 	TheBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
 
