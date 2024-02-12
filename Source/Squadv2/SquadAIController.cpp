@@ -85,7 +85,10 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 			GetCharacter()->UnCrouch();
 
 		}
-		TheBlackboard->SetValueAsBool(FName("bShouldFollow"), false);
+		if (this->Implements<USquadInterface>())
+		{
+			ISquadInterface::Execute_StopFollow(this);
+		}
 		MoveToLocation(CommandPoint.Location, 100);
 		HandleCommand(CommandPoint);
 	}
@@ -141,10 +144,8 @@ void ASquadAIController::FollowPlayer()
 		Delegate.Unbind();*/
 		AssignedPosition = TheBlackboard->GetValueAsObject(FName("AssignedPosition"));
 		AActor* AssignedPositionPtr = Cast<AActor>(AssignedPosition);
-		UE_LOG(LogTemp, Warning, TEXT("Check 5"));
 		if (AssignedPosition != nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Check 6"));
 			FTimerDelegate Delegate;
 			Delegate.BindUFunction(this, "FollowPlayer");
 			float DistanceThreshold = 100.0f;

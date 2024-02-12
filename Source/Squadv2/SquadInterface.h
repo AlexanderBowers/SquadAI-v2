@@ -46,4 +46,6 @@ public:
 	void DetonateBomb(FCommandPoint CommandPoint);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MoveSquad")
 	void GiveOrder(FCommandPoint CommandPoint);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MoveSquad")
+	void StopFollow();
 };

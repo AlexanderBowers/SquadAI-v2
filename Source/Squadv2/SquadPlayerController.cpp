@@ -253,8 +253,8 @@ ASquadAIController* ASquadPlayerController::GetAvailableMember(FCommandPoint Com
 			UE_LOG(LogTemp, Warning, TEXT("bIsAssigned value: %d"), Blackboard->GetValueAsBool(FName("bIsAssigned")));
 			Blackboard->SetValueAsVector(FName("AssignedLocation"), CommandPoint.Location);
 			UE_LOG(LogTemp, Warning, TEXT("found closest unassigned member: %s"), *ClosestMember->GetName());
-			ClosestMember->ResetFollow();
-			//Blackboard->SetValueAsBool(FName("bShouldFollow"), false);
+			//ClosestMember->ResetFollow();
+			Blackboard->SetValueAsBool(FName("bShouldFollow"), false);
 			//^^^ This was originally ClosestMember->ResetFollow(). ResetFollow needs to be retweaked.
 				//if(bShouldFollow -> ResetPriorityCommand on the squad location. if false -> bShouldFollow and get assigned a squadlocation.)
 			ClosestMember->MoveToCommand(CommandPoint);
