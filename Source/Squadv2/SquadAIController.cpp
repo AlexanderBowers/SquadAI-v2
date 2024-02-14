@@ -226,7 +226,6 @@ void ASquadAIController::ResetPriorityCommand()
 		TheBlackboard->SetValueAsObject(FName("AssignedPosition"), nullptr);
 	}
 	AssignedPosition = nullptr;
-	TheBlackboard->SetValueAsBool(FName("bShouldFollow"), true);
 	TheBlackboard->SetValueAsBool(FName("bHasPriority"), false);
 	TheBlackboard->SetValueAsBool(FName("bIsAssigned"), false);
 	
