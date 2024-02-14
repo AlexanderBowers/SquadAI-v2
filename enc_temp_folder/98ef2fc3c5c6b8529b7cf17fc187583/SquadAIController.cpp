@@ -89,7 +89,7 @@ void ASquadAIController::MoveToCommand(FCommandPoint CommandPoint) //If they rec
 		{
 			ISquadInterface::Execute_StopFollow(this);
 		}
-		MoveToLocation(CommandPoint.Location, 25);
+		MoveToLocation(CommandPoint.Location, 100);
 		HandleCommand(CommandPoint);
 	}
 
