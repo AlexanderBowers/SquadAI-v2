@@ -132,16 +132,7 @@ void ASquadAIController::FollowPlayer()
 {
 	if (TheBlackboard)
 	{
-		/*if (GetCharacter()->bIsCrouched)
-		{
-			GetCharacter()->UnCrouch();
-
-		}
-		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "FollowPlayer");
-		MoveToLocation(PlayerController->GetPawn()->GetActorLocation(), 200);
-		GetWorldTimerManager().SetTimer(TimerHandle, Delegate, 0.5f, TheBlackboard->GetValueAsBool(FName("bShouldFollow")), 0.0f);
-		Delegate.Unbind();*/
+		
 		AssignedPosition = TheBlackboard->GetValueAsObject(FName("AssignedPosition"));
 		AActor* AssignedPositionPtr = Cast<AActor>(AssignedPosition);
 		if (AssignedPosition != nullptr)
